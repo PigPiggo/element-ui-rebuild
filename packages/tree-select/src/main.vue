@@ -1,9 +1,11 @@
 <template>
   <div
+    class="el-select"
     v-clickoutside="() => toggleDropDownVisible(false)"
     :class="[{ 'is-disabled': disabled }]"
   >
     <el-input
+      ref="reference"
       :disabled="disabled"
       @focus="toggleDropDownVisible(true)"
       v-model="inputValue"
@@ -14,71 +16,94 @@
           :class="[
             'el-input__icon',
             'el-icon-arrow-down',
-            dropDownVisible && 'is-reverse',
+            visible && 'is-reverse',
           ]"
           @click.stop="toggleDropDownVisible()"
         ></i> </template
     ></el-input>
-    <el-card v-show="dropDownVisible">
-      <el-input size="small" @input="search" v-model="keywords">
-        <template slot="suffix">
-          <i
-            key="clear"
-            class="el-input__icon el-icon-circle-close"
-            @click.stop="handleClear"
-          ></i>
-        </template>
-      </el-input>
-      <el-tree
-        ref="tree"
-        :highlight-current="highlightCurrent"
-        :data="treeData"
-        :emptyText="emptyText"
-        :renderAfterExpand="renderAfterExpand"
-        :expandOnClickNode="expandOnClickNode"
-        :checkDescendants="checkDescendants"
-        :autoExpandParent="autoExpandParent"
-        :showCheckbox="showCheckbox"
-        :draggable="draggable"
-        :props="props"
-        :lazy="lazy"
-        :nodeKey="nodeKey"
-        :checkStrictly="checkStrictly"
-        :defaultExpandAll="defaultExpandAll"
-        :checkOnClickNode="checkOnClickNode"
-        :defaultCheckedKeys="defaultCheckedKeys"
-        :defaultExpandedKeys="defaultExpandedKeys"
-        :currentNodeKey="currentNodeKey"
-        :renderContent="renderContent"
-        :allowDrag="allowDrag"
-        :allowDrop="allowDrop"
-        :highlightCurrent="highlightCurrent"
-        :load="load"
-        :filterNodeMethod="filterNodeMethod"
-        :accordion="accordion"
-        :iconClass="iconClass"
-        @node-expand="handleNodeExpand"
-        @node-drag-star="handleDragStart"
-        @node-drag-leave="handleDragLeavve"
-        @node-drag-enter="handleDragEnter"
-        @node-drag-over="handleDragOver"
-        @node-drag-end="handleDragEnd"
-        @node-drop="handleDrop"
-        @node-click="handleNodeClick"
-      ></el-tree>
-    </el-card>
+    <transition name="el-zoom-in-top" @after-leave="doDestroy">
+      <el-tree-select-menu
+        ref="popper"
+        :append-to-body="popperAppendToBody"
+        v-show="visible"
+      >
+        <el-scrollbar
+          tag="ul"
+          wrap-class="el-select-dropdown__wrap"
+          view-class="el-select-dropdown__list"
+          ref="scrollbar"
+          :class="{
+            'is-empty': !treeData.length,
+          }"
+        >
+          <el-input size="small" @input="search" v-model="keywords">
+            <template slot="suffix">
+              <i
+                key="clear"
+                class="el-input__icon el-icon-circle-close"
+                @click.stop="handleClear"
+              ></i>
+            </template>
+          </el-input>
+          <el-tree
+            ref="tree"
+            :highlight-current="highlightCurrent"
+            :data="treeData"
+            :emptyText="emptyText"
+            :renderAfterExpand="renderAfterExpand"
+            :expandOnClickNode="expandOnClickNode"
+            :checkDescendants="checkDescendants"
+            :autoExpandParent="autoExpandParent"
+            :showCheckbox="showCheckbox"
+            :draggable="draggable"
+            :props="props"
+            :lazy="lazy"
+            :nodeKey="nodeKey"
+            :checkStrictly="checkStrictly"
+            :defaultExpandAll="defaultExpandAll"
+            :checkOnClickNode="checkOnClickNode"
+            :defaultCheckedKeys="defaultCheckedKeys"
+            :defaultExpandedKeys="defaultExpandedKeys"
+            :currentNodeKey="currentNodeKey"
+            :renderContent="renderContent"
+            :allowDrag="allowDrag"
+            :allowDrop="allowDrop"
+            :highlightCurrent="highlightCurrent"
+            :load="load"
+            :filterNodeMethod="filterNodeMethod"
+            :accordion="accordion"
+            :iconClass="iconClass"
+            @node-expand="handleNodeExpand"
+            @node-drag-star="handleDragStart"
+            @node-drag-leave="handleDragLeavve"
+            @node-drag-enter="handleDragEnter"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
+            @node-click="handleNodeClick"
+          ></el-tree>
+        </el-scrollbar>
+      </el-tree-select-menu>
+    </transition>
   </div>
 </template>
 
 <script>
 import Clickoutside from 'element-ui/src/utils/clickoutside';
 import { isDef } from 'element-ui/src/utils/shared';
-import { t } from 'element-ui/src/locale';
+import ElTreeSelectMenu from './select-menu';
+import Emitter from 'element-ui/src/mixins/emitter';
 
 export default {
+  mixins: [Emitter],
+
   name: 'ELTreeSelect',
 
   directives: { Clickoutside },
+
+  components: {
+    ElTreeSelectMenu,
+  },
 
   props: {
     data: {
@@ -140,7 +165,7 @@ export default {
           label: 'label',
           value: 'value',
           disabled: 'disabled',
-          emitPath:true
+          emitPath: true,
         };
       },
     },
@@ -156,6 +181,12 @@ export default {
       default: 18,
     },
     iconClass: String,
+
+    // popper属性
+    popperAppendToBody: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     treeData() {
@@ -178,7 +209,7 @@ export default {
       inputValue: '',
       keywords: '',
       searchResData: [],
-      dropDownVisible: false,
+      visible: false,
       checkedValue: this.value,
       inputHover: false,
       inputValue: null,
@@ -193,8 +224,8 @@ export default {
   },
   methods: {
     handleNodeClick(label, value, nodeData, node, instance) {
-      this.inputValue = label; 
-      this.syncValue (value);
+      this.inputValue = label;
+      this.syncValue(value);
     },
     search(keywords) {
       if (this.lazy)
@@ -211,14 +242,13 @@ export default {
     syncValue(value) {
       this.$emit('input', value);
     },
-    toggleDropDownVisible(dropDownVisible) {
+    toggleDropDownVisible(visible) {
       if (this.disabled) return;
-      this.dropDownVisible = isDef(dropDownVisible)
-        ? dropDownVisible
-        : !this.dropDownVisible;
+      this.visible = isDef(visible) ? visible : !this.visible;
+      this.broadcast('ElTreeSelectDropdown', 'updatePopper');
     },
     handleNodeExpand(nodeData, node, instance) {
-      this.$emit ('node-expand', nodeData, node, instance)
+      this.$emit('node-expand', nodeData, node, instance);
     },
     // todo 拖拽功能暂无
     handleDragStart(dragNode, dropNode, dropType, event) {},
@@ -232,29 +262,33 @@ export default {
       return data[this.props.label].indexOf(value) !== -1;
     },
 
-    getCurrentNode () {
-      const currentNode = this.$refs.tree.store.currentNode
-      return currentNode ? {...currentNode} : undefined; 
-    }, 
+    getCurrentNode() {
+      const currentNode = this.$refs.tree.store.currentNode;
+      return currentNode ? { ...currentNode } : undefined;
+    },
 
-    getCurrentData () {
-      const currentNode = this.getCurrentNode (); 
-      if (currentNode) return {...currentNode.data}
-      return undefined; 
-    }, 
+    getCurrentData() {
+      const currentNode = this.getCurrentNode();
+      if (currentNode) return { ...currentNode.data };
+      return undefined;
+    },
 
-    getCurrentInfo () {
-      const currentNode = this.$refs.tree.store.currentNode; 
+    getCurrentInfo() {
+      const currentNode = this.$refs.tree.store.currentNode;
       return {
-        currentNode, 
-        pl: currentNode.getPathLabels (), 
-        pn: currentNode.getPathpathNodess (), 
-        pv: currentNode.getPathValues (), 
-        pd: currentNode.getPathDatas (), 
-        v: currentNode.getValue (), 
-        t: currentNode.getText (), 
-      }
-    }
+        currentNode,
+        pl: currentNode.getPathLabels(),
+        pn: currentNode.getPathpathNodess(),
+        pv: currentNode.getPathValues(),
+        pd: currentNode.getPathDatas(),
+        v: currentNode.getValue(),
+        t: currentNode.getText(),
+      };
+    },
+
+    doDestroy() {
+      this.$refs.popper && this.$refs.popper.doDestroy();
+    },
   },
 };
 </script>
