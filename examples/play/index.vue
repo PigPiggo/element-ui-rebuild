@@ -1,6 +1,9 @@
 <template>
   <div style="margin: 20px;">
-    <ELTreeSelect :data="treeData"></ELTreeSelect>
+    <ELTreeSelect
+    :data="treeData"
+    @node-expand="handleNodeExpand"
+    ></ELTreeSelect>
   </div>
 </template>
 
@@ -67,5 +70,12 @@ export default {
       ],
     };
   },
+  methods: {
+    handleNodeExpand (nodeData, node, instance) {
+      console.log(nodeData);
+      console.log(node);
+      console.log(instance);
+    }
+  }
 };
 </script>

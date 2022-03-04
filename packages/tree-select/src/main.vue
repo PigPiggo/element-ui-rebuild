@@ -217,9 +217,7 @@ export default {
         : !this.dropDownVisible;
     },
     handleNodeExpand(nodeData, node, instance) {
-      console.log(nodeData);
-      console.log(node);
-      console.log(instance);
+      this.$emit ('node-expand', nodeData, node, instance)
     },
     handleDragStart(dragNode, dropNode, dropType, event) {},
     handleDragLeavve(dragNode, dropNode, dropType, event) {},
