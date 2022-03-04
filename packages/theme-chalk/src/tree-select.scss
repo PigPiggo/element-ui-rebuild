@@ -1,4 +1,5 @@
 @import "mixins/mixins";
+@import "./tree-select-dropdown.scss";
 
 @include b(tree-select) {
   .el-icon-arrow-down {
