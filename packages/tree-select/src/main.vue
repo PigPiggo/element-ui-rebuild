@@ -27,15 +27,9 @@
         :append-to-body="popperAppendToBody"
         v-show="visible"
       >
-        <el-scrollbar
-          tag="ul"
-          wrap-class="el-select-dropdown__wrap"
-          view-class="el-select-dropdown__list"
-          ref="scrollbar"
-          :class="{
-            'is-empty': !treeData.length,
-          }"
-        >
+        <div class="wrap" :style="{
+          width: wrapWidth
+        }">
           <el-input size="small" @input="search" v-model="keywords">
             <template slot="suffix">
               <i
@@ -45,44 +39,54 @@
               ></i>
             </template>
           </el-input>
-          <el-tree
-            ref="tree"
-            :highlight-current="highlightCurrent"
-            :data="treeData"
-            :emptyText="emptyText"
-            :renderAfterExpand="renderAfterExpand"
-            :expandOnClickNode="expandOnClickNode"
-            :checkDescendants="checkDescendants"
-            :autoExpandParent="autoExpandParent"
-            :showCheckbox="showCheckbox"
-            :draggable="draggable"
-            :props="props"
-            :lazy="lazy"
-            :nodeKey="nodeKey"
-            :checkStrictly="checkStrictly"
-            :defaultExpandAll="defaultExpandAll"
-            :checkOnClickNode="checkOnClickNode"
-            :defaultCheckedKeys="defaultCheckedKeys"
-            :defaultExpandedKeys="defaultExpandedKeys"
-            :currentNodeKey="currentNodeKey"
-            :renderContent="renderContent"
-            :allowDrag="allowDrag"
-            :allowDrop="allowDrop"
-            :highlightCurrent="highlightCurrent"
-            :load="load"
-            :filterNodeMethod="filterNodeMethod"
-            :accordion="accordion"
-            :iconClass="iconClass"
-            @node-expand="handleNodeExpand"
-            @node-drag-star="handleDragStart"
-            @node-drag-leave="handleDragLeavve"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
-            @node-click="handleNodeClick"
-          ></el-tree>
-        </el-scrollbar>
+          <el-scrollbar
+            tag="ul"
+            wrap-class="el-tree-select-dropdown__wrap"
+            view-class="el-tree-select-dropdown__list"
+            ref="scrollbar"
+            :class="{
+              'is-empty': !treeData.length,
+            }"
+          >
+            <el-tree
+              ref="tree"
+              :highlight-current="highlightCurrent"
+              :data="treeData"
+              :emptyText="emptyText"
+              :renderAfterExpand="renderAfterExpand"
+              :expandOnClickNode="expandOnClickNode"
+              :checkDescendants="checkDescendants"
+              :autoExpandParent="autoExpandParent"
+              :showCheckbox="showCheckbox"
+              :draggable="draggable"
+              :props="props"
+              :lazy="lazy"
+              :nodeKey="nodeKey"
+              :checkStrictly="checkStrictly"
+              :defaultExpandAll="defaultExpandAll"
+              :checkOnClickNode="checkOnClickNode"
+              :defaultCheckedKeys="defaultCheckedKeys"
+              :defaultExpandedKeys="defaultExpandedKeys"
+              :currentNodeKey="currentNodeKey"
+              :renderContent="renderContent"
+              :allowDrag="allowDrag"
+              :allowDrop="allowDrop"
+              :highlightCurrent="highlightCurrent"
+              :load="load"
+              :filterNodeMethod="filterNodeMethod"
+              :accordion="accordion"
+              :iconClass="iconClass"
+              @node-expand="handleNodeExpand"
+              @node-drag-star="handleDragStart"
+              @node-drag-leave="handleDragLeavve"
+              @node-drag-enter="handleDragEnter"
+              @node-drag-over="handleDragOver"
+              @node-drag-end="handleDragEnd"
+              @node-drop="handleDrop"
+              @node-click="handleNodeClick"
+            ></el-tree>
+          </el-scrollbar>
+        </div>
       </el-tree-select-menu>
     </transition>
   </div>
@@ -220,7 +224,12 @@ export default {
       suggestions: [],
       inputInitialHeight: 0,
       pressDeleteCount: 0,
+      wrapWidth: '',
     };
+  },
+  mounted () {
+    this.wrapWidth = this.$refs.reference.$el.getBoundingClientRect().width + 'px'
+
   },
   methods: {
     handleNodeClick(label, value, nodeData, node, instance) {
@@ -236,8 +245,7 @@ export default {
       this.searchResData = data;
     },
     handleClear() {
-      this.inputValue = '';
-      this.syncValue(this.inputValue);
+      this.search (); 
     },
     syncValue(value) {
       this.$emit('input', value);

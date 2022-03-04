@@ -1,7 +1,10 @@
 @import "mixins/mixins";
-.el-icon-arrow-down {
-  transition: transform 0.3s;
-  @include when(reverse) {
-    transform: rotateZ(180deg);
+
+@include b(tree-select) {
+  .el-icon-arrow-down {
+    transition: transform 0.3s;
+    @include when(reverse) {
+      transform: rotateZ(180deg);
+    }
   }
 }
