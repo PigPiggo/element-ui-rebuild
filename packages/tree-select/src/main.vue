@@ -30,9 +30,9 @@
         </template>
       </el-input>
       <el-tree
+        ref="tree"
         :highlight-current="highlightCurrent"
-        :expand-on-click-node="false"
-        :data="data"
+        :data="treeData"
         :emptyText="emptyText"
         :renderAfterExpand="renderAfterExpand"
         :expandOnClickNode="expandOnClickNode"
@@ -42,7 +42,7 @@
         :draggable="draggable"
         :props="props"
         :lazy="lazy"
-        nodeKey
+        :nodeKey="nodeKey"
         :checkStrictly="checkStrictly"
         :defaultExpandAll="defaultExpandAll"
         :checkOnClickNode="checkOnClickNode"
@@ -64,6 +64,7 @@
         @node-drag-over="handleDragOver"
         @node-drag-end="handleDragEnd"
         @node-drop="handleDrop"
+        @node-click="handleNodeClick"
       ></el-tree>
     </el-card>
   </div>
@@ -72,8 +73,7 @@
 <script>
 import Clickoutside from 'element-ui/src/utils/clickoutside';
 import { isDef } from 'element-ui/src/utils/shared';
-  import {t} from 'element-ui/src/locale';
-
+import { t } from 'element-ui/src/locale';
 
 export default {
   name: 'ELTreeSelect',
@@ -83,63 +83,7 @@ export default {
   props: {
     data: {
       default() {
-        return [
-          {
-            label: '一级 1',
-            children: [
-              {
-                label: '二级 1-1',
-                children: [
-                  {
-                    label: '三级 1-1-1',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            label: '一级 2',
-            children: [
-              {
-                label: '二级 2-1',
-                children: [
-                  {
-                    label: '三级 2-1-1',
-                  },
-                ],
-              },
-              {
-                label: '二级 2-2',
-                children: [
-                  {
-                    label: '三级 2-2-1',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            label: '一级 3',
-            children: [
-              {
-                label: '二级 3-1',
-                children: [
-                  {
-                    label: '三级 3-1-1',
-                  },
-                ],
-              },
-              {
-                label: '二级 3-2',
-                children: [
-                  {
-                    label: '三级 3-2-1',
-                  },
-                ],
-              },
-            ],
-          },
-        ];
+        return [];
       },
     },
     clearable: {
@@ -154,12 +98,7 @@ export default {
     },
 
     // tree属性
-    emptyText: {
-      type: String,
-      default() {
-        return t('el.tree.emptyText');
-      },
-    },
+    emptyText: String,
     renderAfterExpand: {
       type: Boolean,
       default: true,
@@ -169,7 +108,7 @@ export default {
     defaultExpandAll: Boolean,
     expandOnClickNode: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     checkOnClickNode: Boolean,
     checkDescendants: {
@@ -209,7 +148,6 @@ export default {
     },
     highlightCurrent: Boolean,
     load: Function,
-    filterNodeMethod: Function,
     accordion: Boolean,
     indent: {
       type: Number,
@@ -218,7 +156,7 @@ export default {
     iconClass: String,
   },
   computed: {
-    data() {
+    treeData() {
       return this.search ? this.data : this.searchResData;
     },
     clearBtnVisible() {
@@ -252,11 +190,15 @@ export default {
     };
   },
   methods: {
-    handleNodeClick() {
-      return false;
+    handleNodeClick(nodeData, node, instance) {
+      console.log(nodeData);
+      console.log(node);
+      console.log(instance);
     },
     search(keywords) {
-      this.$emit('search', keywords, this.setSearchResData);
+      if (this.lazy)
+        return this.$emit('search', keywords, this.setSearchResData);
+      return this.$refs.tree.filter(keywords);
     },
     setSearchResData(data) {
       this.searchResData = data;
@@ -274,26 +216,20 @@ export default {
         ? dropDownVisible
         : !this.dropDownVisible;
     },
-    handleNodeExpand (dragNode, dropNode, dropType, event) {
-
+    handleNodeExpand(nodeData, node, instance) {
+      console.log(nodeData);
+      console.log(node);
+      console.log(instance);
     },
-    handleDragStart (dragNode, dropNode, dropType, event) {
-
-    },
-    handleDragLeavve (dragNode, dropNode, dropType, event) {
-
-    },
-    handleDragEnter (dragNode, dropNode, dropType, event) {
-
-    },
-    handleDragOver (dragNode, dropNode, dropType, event) {
-
-    },
-    handleDragEnd (dragNode, dropNode, dropType, event) {
-
-    },
-    handleDrop (dragNode, dropNode, dropType, event) {
-
+    handleDragStart(dragNode, dropNode, dropType, event) {},
+    handleDragLeavve(dragNode, dropNode, dropType, event) {},
+    handleDragEnter(dragNode, dropNode, dropType, event) {},
+    handleDragOver(dragNode, dropNode, dropType, event) {},
+    handleDragEnd(dragNode, dropNode, dropType, event) {},
+    handleDrop(dragNode, dropNode, dropType, event) {},
+    filterNodeMethod(value, data) {
+      if (!value) return true;
+      return data[this.props.label].indexOf(value) !== -1;
     },
   },
 };
