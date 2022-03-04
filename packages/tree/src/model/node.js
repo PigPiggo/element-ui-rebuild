@@ -22,10 +22,10 @@ export const getChildState = node => {
   return { all, none, allWithoutDisable, half: !all && !none };
 };
 
-const reInitChecked = function(node) {
+const reInitChecked = function (node) {
   if (node.childNodes.length === 0) return;
 
-  const {all, none, half} = getChildState(node.childNodes);
+  const { all, none, half } = getChildState(node.childNodes);
   if (all) {
     node.checked = true;
     node.indeterminate = false;
@@ -45,7 +45,7 @@ const reInitChecked = function(node) {
   }
 };
 
-const getPropertyFromData = function(node, prop) {
+const getPropertyFromData = function (node, prop) {
   const props = node.store.props;
   const data = node.data || {};
   const config = props[prop];
@@ -79,7 +79,6 @@ export default class Node {
         this[name] = options[name];
       }
     }
-
     // internal
     this.level = 0;
     this.loaded = false;
@@ -133,6 +132,9 @@ export default class Node {
     }
 
     this.updateLeafState();
+
+    this.initPath()
+
   }
 
   setData(data) {
@@ -192,7 +194,7 @@ export default class Node {
   }
 
   contains(target, deep = true) {
-    const walk = function(parent) {
+    const walk = function (parent) {
       const children = parent.childNodes || [];
       let result = false;
       for (let i = 0, j = children.length; i < j; i++) {
@@ -481,5 +483,50 @@ export default class Node {
         callback.call(this);
       }
     }
+  }
+
+  getValueByOption() {
+    return this.store.props.emitPath
+      ? this.getPathValues()
+      : this.getValue();
+  }
+  calculatePathNodes() {
+    const nodes = [this];
+    let parent = this.parent;
+
+    while (parent && !Array.isArray (parent.data)) {
+      nodes.unshift(parent);
+      parent = parent.parent;
+    }
+
+    return nodes;
+  }
+  getPathLabels() {
+    return this.pathLabels;
+  }
+  getPathpathNodess() {
+    return this.pathNodes;
+  }
+  getPathValues() {
+    return this.pathValues;
+  }
+  getPathDatas() {
+    return this.pathDatas;
+  }
+  getValue() {
+    return this.data;
+  }
+
+  getText() {
+    return this.getPathLabels ().join (this.store.props.separator)
+  }
+
+  initPath() {
+    if (!this.store.props.emitPath)
+      return;
+    this.pathNodes = this.calculatePathNodes();
+    this.pathValues = this.pathNodes.map(node => node[this.store.props.value] || node[this.store.props.label]);
+    this.pathLabels = this.pathNodes.map(node => node[this.store.props.label]);
+    this.pathDatas = this.pathNodes.map(node => node.data);
   }
 }

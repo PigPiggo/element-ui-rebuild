@@ -138,7 +138,9 @@ export default {
         return {
           children: 'children',
           label: 'label',
+          value: 'value',
           disabled: 'disabled',
+          emitPath:true
         };
       },
     },
@@ -190,10 +192,9 @@ export default {
     };
   },
   methods: {
-    handleNodeClick(nodeData, node, instance) {
-      console.log(nodeData);
-      console.log(node);
-      console.log(instance);
+    handleNodeClick(label, value, nodeData, node, instance) {
+      this.inputValue = label; 
+      this.syncValue (value);
     },
     search(keywords) {
       if (this.lazy)
@@ -208,7 +209,7 @@ export default {
       this.syncValue(this.inputValue);
     },
     syncValue(value) {
-      this.$emit('change', value);
+      this.$emit('input', value);
     },
     toggleDropDownVisible(dropDownVisible) {
       if (this.disabled) return;
@@ -219,6 +220,7 @@ export default {
     handleNodeExpand(nodeData, node, instance) {
       this.$emit ('node-expand', nodeData, node, instance)
     },
+    // todo 拖拽功能暂无
     handleDragStart(dragNode, dropNode, dropType, event) {},
     handleDragLeavve(dragNode, dropNode, dropType, event) {},
     handleDragEnter(dragNode, dropNode, dropType, event) {},
@@ -229,6 +231,30 @@ export default {
       if (!value) return true;
       return data[this.props.label].indexOf(value) !== -1;
     },
+
+    getCurrentNode () {
+      const currentNode = this.$refs.tree.store.currentNode
+      return currentNode ? {...currentNode} : undefined; 
+    }, 
+
+    getCurrentData () {
+      const currentNode = this.getCurrentNode (); 
+      if (currentNode) return {...currentNode.data}
+      return undefined; 
+    }, 
+
+    getCurrentInfo () {
+      const currentNode = this.$refs.tree.store.currentNode; 
+      return {
+        currentNode, 
+        pl: currentNode.getPathLabels (), 
+        pn: currentNode.getPathpathNodess (), 
+        pv: currentNode.getPathValues (), 
+        pd: currentNode.getPathDatas (), 
+        v: currentNode.getValue (), 
+        t: currentNode.getText (), 
+      }
+    }
   },
 };
 </script>
