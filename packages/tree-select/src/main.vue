@@ -101,7 +101,7 @@ import Emitter from 'element-ui/src/mixins/emitter';
 export default {
   mixins: [Emitter],
 
-  name: 'ELTreeSelect',
+  name: 'ElTreeSelect',
 
   directives: { Clickoutside },
 

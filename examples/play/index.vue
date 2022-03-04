@@ -1,21 +1,13 @@
 <template>
   <div style="margin: 20px;">
     <el-button @click="aa">试试</el-button>
-    <ELTreeSelect
+    <el-tree-select
       ref="selectTree"
       :data="treeData"
       @node-expand="handleNodeExpand"
       v-model="value"
-    ></ELTreeSelect>
-    <el-select v-model="select" clearable placeholder="请选择">
-      <el-option
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      >
-      </el-option>
-    </el-select>
+    ></el-tree-select>
+
   </div>
 </template>
 
