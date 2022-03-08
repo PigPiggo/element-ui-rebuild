@@ -60,7 +60,7 @@
               :showCheckbox="showCheckbox"
               :draggable="draggable"
               :props="props"
-              :lazy="lazy"
+              :lazy="false"
               :nodeKey="nodeKey"
               :checkStrictly="checkStrictly"
               :defaultExpandAll="defaultExpandAll"
@@ -93,6 +93,7 @@
 </template>
 
 <script>
+let cacheLastExpand = null; 
 import Clickoutside from 'element-ui/src/utils/clickoutside';
 import { isDef } from 'element-ui/src/utils/shared';
 import ElTreeSelectMenu from './select-menu';
@@ -195,7 +196,7 @@ export default {
   },
   computed: {
     treeData() {
-      return this.search ? this.data : this.searchResData;
+      return this.lazy ? this.searchResData : this.data;
     },
     clearBtnVisible() {
       if (!this.clearable || this.disabled) {
@@ -228,11 +229,31 @@ export default {
       wrapWidth: '',
     };
   },
+  created () {
+    const unwatch = this.$watch ('data', (value) => {
+      if (!!value && Array.isArray (value) && value.length) {
+        this.searchResData = value;
+        unwatch () 
+      }
+    })
+  },  
   mounted () {
     this.wrapWidth = this.$refs.reference.$el.getBoundingClientRect().width + 'px'
+    if (!this.lazy)
     this.syncValueSelect (); 
-
   },
+  watch: {
+    data: {
+      handler () {
+        if (!cacheLastExpand) return
+        if (!Array.isArray (cacheLastExpand.node.childNodes)) {
+          cacheLastExpand.node.isLeaf = true
+        }
+        cacheLastExpand.node.loading = false
+      }, 
+      deep: true
+    }
+  }, 
   methods: {
     handleNodeClick(label, value, nodeData, node, instance) {
       this.inputValue = label;
@@ -258,6 +279,11 @@ export default {
       this.broadcast('ElTreeSelectDropdown', 'updatePopper');
     },
     handleNodeExpand(nodeData, node, instance) {
+      cacheLastExpand = {
+        nodeData, node,
+      }; 
+      if (!node.childNodes.length)
+        node.loading = true 
       this.$emit('node-expand', nodeData, node, instance);
     },
     // todo 拖拽功能暂无
@@ -324,6 +350,14 @@ export default {
           await this.$nextTick ();
         }
       }
+    },
+
+    handlerLazyLoad (node) {
+      if (node.childNodes.length !== 0) return;
+      this.loadData
+      .then(res => {
+
+      })
     }
   },
 };

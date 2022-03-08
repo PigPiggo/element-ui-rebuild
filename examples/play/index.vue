@@ -2,11 +2,12 @@
   <div style="margin: 20px;">
     <el-button @click="aa">试试</el-button>
     <el-tree-select
+      :data="data"
       ref="selectTree"
       @node-expand="handleNodeExpand"
       v-model="value"
       :lazy="true"
-      :load="loadNode"
+      :loadData="loadData"
     ></el-tree-select>
     <!-- <el-tree-select
       :data="data"
@@ -15,11 +16,11 @@
       v-model="value"
       node-key="label"
     ></el-tree-select> -->
-    <el-cascader v-model="select" :options="options"></el-cascader>
   </div>
 </template>
 
 <script>
+let id = 0;
 export default {
   data() {
     return {
@@ -28,8 +29,7 @@ export default {
         children: 'zones',
         isLeaf: 'leaf',
       },
-      value: ['一级 1', '二级 1-1', '三级 1-1-1'],
-      select: ["zhinan","shejiyuanze","yizhi"],
+      value: ['选项0', 1, 2, 3, 4],
       options: [
         {
           value: 'zhinan',
@@ -298,92 +298,55 @@ export default {
           ],
         },
       ],
-      data: [
-        {
-          label: '一级 1',
-          children: [
-            {
-              label: '二级 1-1',
-              children: [
-                {
-                  label: '三级 1-1-1',
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: '一级 2',
-          children: [
-            {
-              label: '二级 2-1',
-              children: [
-                {
-                  label: '三级 2-1-1',
-                },
-              ],
-            },
-            {
-              label: '二级 2-2',
-              children: [
-                {
-                  label: '三级 2-2-1',
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: '一级 3',
-          children: [
-            {
-              label: '二级 3-1',
-              children: [
-                {
-                  label: '三级 3-1-1',
-                },
-              ],
-            },
-            {
-              label: '二级 3-2',
-              children: [
-                {
-                  label: '三级 3-2-1',
-                },
-              ],
-            },
-          ],
-        },
-      ],
+      data: [],
     };
   },
+  mounted() {
+    setTimeout(() => {
+      this.data = [
+        {
+          value: id,
+          label: `选项${id}`,
+          children: [
+            {
+              value: ++id,
+              label: `选项${id}`,
+              children: [
+                {
+                  value: ++id,
+                  label: `选项${id}`,
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    }, 1000);
+  },
   methods: {
-    handleNodeExpand(nodeData, node, instance) {},
+    handleNodeExpand(nodeData, node, instance) {
+      
+    },
     aa() {
       console.log(this.$refs.selectTree.getCurrentInfo());
     },
     change(value) {
       console.log(value);
     },
-    loadNode(node, resolve) {
-      if (node.level === 0) {
-        return resolve([{ name: 'region' }]);
-      }
-      if (node.level > 1) return resolve([]);
 
-      setTimeout(() => {
-        const data = [
-          {
-            name: 'leaf',
-            leaf: true,
-          },
-          {
-            name: 'zone',
-          },
-        ];
-
-        resolve(data);
-      }, 500);
+    loadData() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve ([
+            {
+              value: ++id,
+              label: `选项${id}`,
+              children: [],
+            },
+          ])
+        }, 1000);
+      });
     },
   },
 };

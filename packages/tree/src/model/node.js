@@ -73,7 +73,7 @@ export default class Node {
     this.parent = null;
     this.visible = true;
     this.isCurrent = false;
-    this.instance = null; 
+    this.instance = null;
 
     for (let name in options) {
       if (options.hasOwnProperty(name)) {
@@ -344,7 +344,7 @@ export default class Node {
   }
 
   updateLeafState() {
-    if (this.store.lazy === true && this.loaded !== true && typeof this.isLeafByUser !== 'undefined') {
+    /* if (this.store.lazy === true && this.loaded !== true && typeof this.isLeafByUser !== 'undefined') {
       this.isLeaf = this.isLeafByUser;
       return;
     }
@@ -352,7 +352,8 @@ export default class Node {
     if (!this.store.lazy || (this.store.lazy === true && this.loaded === true)) {
       this.isLeaf = !childNodes || childNodes.length === 0;
       return;
-    }
+    } */
+    if (this.isLeaf) return;
     this.isLeaf = false;
   }
 
@@ -495,7 +496,7 @@ export default class Node {
     const nodes = [this];
     let parent = this.parent;
 
-    while (parent && !Array.isArray (parent.data)) {
+    while (parent && !Array.isArray(parent.data)) {
       nodes.unshift(parent);
       parent = parent.parent;
     }
@@ -519,19 +520,21 @@ export default class Node {
   }
 
   getText() {
-    return this.getPathLabels ().join (this.store.props.separator)
+    return this.getPathLabels().join(this.store.props.separator)
   }
 
   initPath() {
     if (!this.store.props.emitPath)
       return;
     this.pathNodes = this.calculatePathNodes();
-    this.pathValues = this.pathNodes.map(node => node.data[this.store.props.value] || node.data[this.store.props.label]);
+    this.pathValues = this.pathNodes.map(node => !isNaN(node.data[this.store.props.value]) ? node.data[this.store.props.value] :
+      !!node.data[this.store.props.value] ? node.data[this.store.props.value] :
+        node.data[this.store.props.label]);
     this.pathLabels = this.pathNodes.map(node => node.data[this.store.props.label]);
     this.pathDatas = this.pathNodes.map(node => node.data);
   }
 
   setInstance(VueComponent) {
-    this.instance = VueComponent; 
+    this.instance = VueComponent;
   }
 }
