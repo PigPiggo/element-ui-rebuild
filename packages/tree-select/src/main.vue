@@ -313,6 +313,8 @@ export default {
           }
         }
         const selectNode = findSelectNode (store.root.childNodes)
+        if (!selectNode)
+          return this.inputValue = Array.isArray (this.value) ? this.value.join (store.props.separator) : ; 
         const { pathNodes } = selectNode; 
         for (let i in pathNodes) {
           if  (Number (i) === pathNodes.length - 1) {

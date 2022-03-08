@@ -1,20 +1,20 @@
 <template>
   <div style="margin: 20px;">
     <el-button @click="aa">试试</el-button>
-    <!-- <el-tree-select
+    <el-tree-select
       ref="selectTree"
       @node-expand="handleNodeExpand"
       v-model="value"
       :lazy="true"
       :load="loadNode"
-    ></el-tree-select> -->
-    <el-tree-select
+    ></el-tree-select>
+    <!-- <el-tree-select
       :data="data"
       ref="selectTree"
       @node-expand="handleNodeExpand"
       v-model="value"
       node-key="label"
-    ></el-tree-select>
+    ></el-tree-select> -->
     <el-cascader v-model="select" :options="options"></el-cascader>
   </div>
 </template>
