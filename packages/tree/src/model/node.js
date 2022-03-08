@@ -525,8 +525,8 @@ export default class Node {
     if (!this.store.props.emitPath)
       return;
     this.pathNodes = this.calculatePathNodes();
-    this.pathValues = this.pathNodes.map(node => node[this.store.props.value] || node[this.store.props.label]);
-    this.pathLabels = this.pathNodes.map(node => node[this.store.props.label]);
+    this.pathValues = this.pathNodes.map(node => node.data[this.store.props.value] || node.data[this.store.props.label]);
+    this.pathLabels = this.pathNodes.map(node => node.data[this.store.props.label]);
     this.pathDatas = this.pathNodes.map(node => node.data);
   }
 }

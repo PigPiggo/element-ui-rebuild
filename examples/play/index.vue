@@ -2,12 +2,12 @@
   <div style="margin: 20px;">
     <el-button @click="aa">试试</el-button>
     <el-tree-select
+      :data="data"
       ref="selectTree"
-      :data="treeData"
       @node-expand="handleNodeExpand"
       v-model="value"
+      :lazy="false"
     ></el-tree-select>
-
   </div>
 </template>
 
@@ -15,7 +15,57 @@
 export default {
   data() {
     return {
-      treeData: [
+      props: {
+        label: 'name',
+        children: 'zones',
+        isLeaf: 'leaf',
+      },
+      value: '',
+      select: '',
+      options: [
+        {
+          value: '选项1',
+          label: '黄金糕',
+        },
+        {
+          value: '选项2',
+          label: '双皮奶',
+        },
+        {
+          value: '选项3',
+          label: '蚵仔煎',
+        },
+        {
+          value: '选项4',
+          label: '龙须面',
+        },
+        {
+          value: '选项5',
+          label: '北京烤鸭',
+        },
+        {
+          value: '选项6',
+          label: '黄金糕',
+        },
+        {
+          value: '选项7',
+          label: '双皮奶',
+        },
+        {
+          value: '选项8',
+          label: '蚵仔煎',
+        },
+        {
+          value: '选项9',
+          label: '龙须面',
+        },
+        {
+          value: '选项10',
+          label: '北京烤鸭',
+        },
+      ],
+      value: '',
+      data: [
         {
           label: '一级 1',
           children: [
@@ -72,51 +122,6 @@ export default {
           ],
         },
       ],
-      value: '',
-      select: '',
-      options: [
-        {
-          value: '选项1',
-          label: '黄金糕',
-        },
-        {
-          value: '选项2',
-          label: '双皮奶',
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎',
-        },
-        {
-          value: '选项4',
-          label: '龙须面',
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭',
-        },
-        {
-          value: '选项6',
-          label: '黄金糕',
-        },
-        {
-          value: '选项7',
-          label: '双皮奶',
-        },
-        {
-          value: '选项8',
-          label: '蚵仔煎',
-        },
-        {
-          value: '选项9',
-          label: '龙须面',
-        },
-        {
-          value: '选项10',
-          label: '北京烤鸭',
-        },
-      ],
-      value: '',
     };
   },
   watch: {
@@ -132,10 +137,29 @@ export default {
     change(value) {
       console.log(value);
     },
+    loadNode(node, resolve) {
+      if (node.level === 0) {
+        return resolve([{ name: 'region' }]);
+      }
+      if (node.level > 1) return resolve([]);
+
+      setTimeout(() => {
+        const data = [
+          {
+            name: 'leaf',
+            leaf: true,
+          },
+          {
+            name: 'zone',
+          },
+        ];
+
+        resolve(data);
+      }, 500);
+    },
   },
 };
 </script>
-
 
 <style scoped>
 .el-select {
