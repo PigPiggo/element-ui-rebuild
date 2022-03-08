@@ -73,6 +73,7 @@ export default class Node {
     this.parent = null;
     this.visible = true;
     this.isCurrent = false;
+    this.instance = null; 
 
     for (let name in options) {
       if (options.hasOwnProperty(name)) {
@@ -528,5 +529,9 @@ export default class Node {
     this.pathValues = this.pathNodes.map(node => node.data[this.store.props.value] || node.data[this.store.props.label]);
     this.pathLabels = this.pathNodes.map(node => node.data[this.store.props.label]);
     this.pathDatas = this.pathNodes.map(node => node.data);
+  }
+
+  setInstance(VueComponent) {
+    this.instance = VueComponent; 
   }
 }

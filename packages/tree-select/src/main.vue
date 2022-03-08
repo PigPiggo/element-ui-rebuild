@@ -110,6 +110,7 @@ export default {
   },
 
   props: {
+    value: {},
     data: {
       default() {
         return [];
@@ -229,6 +230,7 @@ export default {
   },
   mounted () {
     this.wrapWidth = this.$refs.reference.$el.getBoundingClientRect().width + 'px'
+    this.syncValueSelect (); 
 
   },
   methods: {
@@ -297,6 +299,30 @@ export default {
     doDestroy() {
       this.$refs.popper && this.$refs.popper.doDestroy();
     },
+    
+    //   当传入value的时候, 设置选择状态
+    async syncValueSelect () {
+      let value = Array.isArray (this.value) ? this.value[this.value.length - 1] : this.value; 
+      // const store = {...this.$refs.tree.store}
+      const store = this.$refs.tree.store
+      if (!!store.root.childNodes && Array.isArray (store.root.childNodes) && store.root.childNodes.length){
+        function findSelectNode (NodeList, needExpand) {
+          for (let node of NodeList) {
+            if ((node.data[store.props.value] || node.data[store.props.label]) === value) return node; 
+            if (!!node.childNodes && Array.isArray (node.childNodes) && node.childNodes.length) return findSelectNode (node.childNodes)
+          }
+        }
+        const selectNode = findSelectNode (store.root.childNodes)
+        const { pathNodes } = selectNode; 
+        for (let i in pathNodes) {
+          if  (Number (i) === pathNodes.length - 1) {
+              return pathNodes[i].instance.handleClick (); 
+          }
+          pathNodes[i].instance.handleExpandIconClick ()
+          await this.$nextTick ();
+        }
+      }
+    }
   },
 };
 </script>
