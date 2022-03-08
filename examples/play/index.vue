@@ -29,7 +29,7 @@ export default {
         children: 'zones',
         isLeaf: 'leaf',
       },
-      value: 79879879,
+      value: '',
       options: [
         {
           value: 'zhinan',
@@ -336,6 +336,7 @@ export default {
     loadData() {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
+          if (id === 3) resolve ([])
           resolve ([
             {
               value: ++id,

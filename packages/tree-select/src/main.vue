@@ -181,9 +181,15 @@ export default {
     },
     lazy: {
       type: Boolean,
-      default: false,
+      default: () => {
+        return false
+      },
     },
-    highlightCurrent: Boolean,
+    highlightCurrent: {
+      default () {
+        return true;
+      }
+    },
     load: Function,
     accordion: Boolean,
     indent: {
