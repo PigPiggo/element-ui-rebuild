@@ -27,9 +27,12 @@
         :append-to-body="popperAppendToBody"
         v-show="visible"
       >
-        <div class="wrap" :style="{
-          width: wrapWidth
-        }">
+        <div
+          class="wrap"
+          :style="{
+            width: wrapWidth,
+          }"
+        >
           <el-input size="small" @input="search" v-model="keywords">
             <template slot="suffix">
               <i
@@ -93,7 +96,7 @@
 </template>
 
 <script>
-let cacheLastExpand = null; 
+let cacheLastExpand = null;
 import Clickoutside from 'element-ui/src/utils/clickoutside';
 import { isDef } from 'element-ui/src/utils/shared';
 import ElTreeSelectMenu from './select-menu';
@@ -112,6 +115,7 @@ export default {
 
   props: {
     value: {},
+    loadData: {},
     data: {
       default() {
         return [];
@@ -229,31 +233,34 @@ export default {
       wrapWidth: '',
     };
   },
-  created () {
-    const unwatch = this.$watch ('data', (value) => {
-      if (!!value && Array.isArray (value) && value.length) {
+  created() {
+    const unwatch = this.$watch('data', value => {
+      if (!!value && Array.isArray(value) && value.length) {
         this.searchResData = value;
-        unwatch () 
+        this.$nextTick (unwatch)
       }
-    })
-  },  
-  mounted () {
-    this.wrapWidth = this.$refs.reference.$el.getBoundingClientRect().width + 'px'
-    if (!this.lazy)
-    this.syncValueSelect (); 
+    }, {
+      deep: true, 
+      immediate: true
+    });
+  },
+  mounted() {
+    this.wrapWidth =
+      this.$refs.reference.$el.getBoundingClientRect().width + 'px';
+    this.syncValueSelect();
   },
   watch: {
     data: {
-      handler () {
-        if (!cacheLastExpand) return
-        if (!Array.isArray (cacheLastExpand.node.childNodes)) {
-          cacheLastExpand.node.isLeaf = true
+      handler() {
+        if (!cacheLastExpand) return;
+        if (!Array.isArray(cacheLastExpand.node.childNodes)) {
+          cacheLastExpand.node.isLeaf = true;
         }
-        cacheLastExpand.node.loading = false
-      }, 
-      deep: true
-    }
-  }, 
+        cacheLastExpand.node.loading = false;
+      },
+      deep: true,
+    },
+  },
   methods: {
     handleNodeClick(label, value, nodeData, node, instance) {
       this.inputValue = label;
@@ -268,7 +275,7 @@ export default {
       this.searchResData = data;
     },
     handleClear() {
-      this.search (); 
+      this.search();
     },
     syncValue(value) {
       this.$emit('input', value);
@@ -279,11 +286,10 @@ export default {
       this.broadcast('ElTreeSelectDropdown', 'updatePopper');
     },
     handleNodeExpand(nodeData, node, instance) {
-      cacheLastExpand = {
-        nodeData, node,
-      }; 
-      if (!node.childNodes.length)
-        node.loading = true 
+      if (!node.childNodes.length) {
+        node.loading = true;
+        this.handlerLazyLoad(nodeData, node);
+      }
       this.$emit('node-expand', nodeData, node, instance);
     },
     // todo 拖拽功能暂无
@@ -325,40 +331,65 @@ export default {
     doDestroy() {
       this.$refs.popper && this.$refs.popper.doDestroy();
     },
-    
+
     //   当传入value的时候, 设置选择状态
-    async syncValueSelect () {
-      let value = Array.isArray (this.value) ? this.value[this.value.length - 1] : this.value; 
+    async syncValueSelect() {
+      let value = Array.isArray(this.value)
+        ? this.value[this.value.length - 1]
+        : this.value;
       // const store = {...this.$refs.tree.store}
-      const store = this.$refs.tree.store
-      if (!!store.root.childNodes && Array.isArray (store.root.childNodes) && store.root.childNodes.length){
-        function findSelectNode (NodeList, needExpand) {
+      const store = this.$refs.tree.store;
+      if (
+        !!store.root.childNodes &&
+        Array.isArray(store.root.childNodes) &&
+        store.root.childNodes.length
+      ) {
+        function findSelectNode(NodeList, needExpand) {
           for (let node of NodeList) {
-            if ((node.data[store.props.value] || node.data[store.props.label]) === value) return node; 
-            if (!!node.childNodes && Array.isArray (node.childNodes) && node.childNodes.length) return findSelectNode (node.childNodes)
+            if (
+              (node.data[store.props.value] || node.data[store.props.label]) ===
+              value
+            )
+              return node;
+            if (
+              !!node.childNodes &&
+              Array.isArray(node.childNodes) &&
+              node.childNodes.length
+            )
+              return findSelectNode(node.childNodes);
           }
         }
-        const selectNode = findSelectNode (store.root.childNodes)
+        const selectNode = findSelectNode(store.root.childNodes);
         if (!selectNode)
-          return this.inputValue = Array.isArray (this.value) ? this.value.join (store.props.separator) : this.value; 
-        const { pathNodes } = selectNode; 
+          return (this.inputValue = Array.isArray(this.value)
+            ? this.value.join(store.props.separator)
+            : this.value);
+        const { pathNodes } = selectNode;
         for (let i in pathNodes) {
-          if  (Number (i) === pathNodes.length - 1) {
-              return pathNodes[i].instance.handleClick (); 
+          if (Number(i) === pathNodes.length - 1) {
+            return pathNodes[i].instance.handleClick();
           }
-          pathNodes[i].instance.handleExpandIconClick ()
-          await this.$nextTick ();
+          pathNodes[i].instance.handleExpandIconClick();
+          await this.$nextTick();
         }
       }
     },
 
-    handlerLazyLoad (node) {
+    // 懒加载逻辑
+    handlerLazyLoad(nodeData, node) {
       if (node.childNodes.length !== 0) return;
-      this.loadData
-      .then(res => {
-
-      })
-    }
+      this.loadData ().then(res => {
+        node.loading = false; 
+        if (!res) return;
+        if (!Array.isArray(res))
+          throw new Error('loadData应返回一个由Promise包裹的数组');
+        if (res.length === 0) {
+          node.isLeaf = true; 
+        } else {
+          nodeData.children = res;
+        }
+      });
+    },
   },
 };
 </script>

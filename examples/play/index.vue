@@ -29,7 +29,7 @@ export default {
         children: 'zones',
         isLeaf: 'leaf',
       },
-      value: ['选项0', 1, 2, 3, 4],
+      value: 79879879,
       options: [
         {
           value: 'zhinan',
@@ -298,12 +298,7 @@ export default {
           ],
         },
       ],
-      data: [],
-    };
-  },
-  mounted() {
-    setTimeout(() => {
-      this.data = [
+      data: [
         {
           value: id,
           label: `选项${id}`,
@@ -321,8 +316,11 @@ export default {
             },
           ],
         },
-      ];
-    }, 1000);
+      ],
+    };
+  },
+  mounted() {
+
   },
   methods: {
     handleNodeExpand(nodeData, node, instance) {
