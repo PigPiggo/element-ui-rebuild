@@ -302,8 +302,8 @@ export default {
     };
   },
   mounted() {
-    setTimeout (() => {
-      this.data =  [
+    setTimeout(() => {
+      this.data = [
         {
           value: id,
           label: `选项${id}`,
@@ -321,11 +321,11 @@ export default {
             },
           ],
         },
-      ]
-    }, 2000)
-    setTimeout (() => {
-      this.value = 2
-    }, 3000)
+      ];
+    }, 2000);
+    setTimeout(() => {
+      this.value = 2;
+    }, 3000);
   },
   methods: {
     handleNodeExpand(nodeData, node, instance) {},
@@ -338,27 +338,19 @@ export default {
       console.log(value);
     },
 
-    async loadData() {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (id === 3) resolve([]);
-          resolve([
-            {
-              value: ++id,
-              label: `选项${id}`,
-              children: [],
-            },
-          ]);
-        }, 1000);
-      });
-      /* try {
-        const  res = await http (); 
-        return res; 
-        
-      } catch (error) {
-        console.error(error);
-        return []
-      } */
+    async loadData(node, nodeData, callback) {
+      console.log(node);
+      console.log(nodeData);
+      setTimeout(() => {
+        if (id === 3) callback([]);
+        callback([
+          {
+            value: ++id,
+            label: `选项${id}`,
+            children: [],
+          },
+        ]);
+      }, 1000);
     },
   },
 };
