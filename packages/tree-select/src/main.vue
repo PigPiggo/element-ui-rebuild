@@ -182,13 +182,13 @@ export default {
     lazy: {
       type: Boolean,
       default: () => {
-        return false
+        return false;
       },
     },
     highlightCurrent: {
-      default () {
+      default() {
         return true;
-      }
+      },
     },
     load: Function,
     accordion: Boolean,
@@ -228,7 +228,6 @@ export default {
       visible: false,
       checkedValue: this.value,
       inputHover: false,
-      inputValue: null,
       presentText: null,
       presentTags: [],
       checkedNodes: [],
@@ -239,21 +238,11 @@ export default {
       wrapWidth: '',
     };
   },
-  created() {
-    const unwatch = this.$watch('data', value => {
-      if (!!value && Array.isArray(value) && value.length) {
-        this.searchResData = value;
-        this.$nextTick (unwatch)
-      }
-    }, {
-      deep: true, 
-      immediate: true
-    });
-  },
+
   mounted() {
     this.wrapWidth =
       this.$refs.reference.$el.getBoundingClientRect().width + 'px';
-    this.syncValueSelect();
+    this.initSyncValue();
   },
   watch: {
     data: {
@@ -268,9 +257,52 @@ export default {
     },
   },
   methods: {
-    handleNodeClick(label, value, nodeData, node, instance) {
-      this.inputValue = label;
-      this.syncValue(value);
+    initSyncValue() {
+      const sync = () => {
+        unwatchData && unwatchData();
+        unWatchValue && unWatchValue();
+        this.syncValueSelect();
+      };
+
+      const unwatchData = this.$watch(
+        'data',
+        async data => {
+          if (!!data && Array.isArray(data) && data.length) {
+            this.searchResData = data;
+            if (this.value && !this.inputValue) {
+              await this.$nextTick();
+              sync();
+            }
+          }
+        },
+        {
+          deep: true,
+          immediate: true,
+        }
+      );
+      const unWatchValue = this.$watch(
+        'value',
+        async value => {
+          if (
+            !!this.data &&
+            Array.isArray(this.data) &&
+            this.data.length &&
+            !this.inputValue &&
+            value
+          ) {
+            await this.$nextTick();
+            sync();
+          }
+        },
+        {
+          deep: true,
+          immediate: true,
+        }
+      );
+    },
+    handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
+      this.inputValue = pathLabel;
+      this.syncValue(pathValue);
     },
     search(keywords) {
       if (this.lazy)
@@ -325,12 +357,13 @@ export default {
       const currentNode = this.$refs.tree.store.currentNode;
       return {
         currentNode,
-        pl: currentNode.getPathLabels(),
-        pn: currentNode.getPathpathNodess(),
-        pv: currentNode.getPathValues(),
-        pd: currentNode.getPathDatas(),
-        v: currentNode.getValue(),
-        t: currentNode.getText(),
+        pathLabels: currentNode.getPathLabels(),
+        pathNodes: currentNode.getPathNodes(),
+        pathValue: currentNode.getPathValues(),
+        pathData: currentNode.getPathDatas(),
+        currentValue: currentNode.getCurrentValue(),
+        currentLabel: currentNode.getCurrentLabel(),
+        pathLabel: currentNode.getPathLabels(),
       };
     },
 
@@ -384,13 +417,13 @@ export default {
     // 懒加载逻辑
     handlerLazyLoad(nodeData, node) {
       if (node.childNodes.length !== 0) return;
-      this.loadData ().then(res => {
-        node.loading = false; 
+      this.loadData().then(res => {
+        node.loading = false;
         if (!res) return;
         if (!Array.isArray(res))
           throw new Error('loadData应返回一个由Promise包裹的数组');
         if (res.length === 0) {
-          node.isLeaf = true; 
+          node.isLeaf = true;
         } else {
           nodeData.children = res;
         }

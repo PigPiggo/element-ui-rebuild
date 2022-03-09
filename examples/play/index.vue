@@ -298,7 +298,12 @@ export default {
           ],
         },
       ],
-      data: [
+      data: [],
+    };
+  },
+  mounted() {
+    setTimeout (() => {
+      this.data =  [
         {
           value: id,
           label: `选项${id}`,
@@ -316,36 +321,44 @@ export default {
             },
           ],
         },
-      ],
-    };
-  },
-  mounted() {
-
+      ]
+    }, 2000)
+    setTimeout (() => {
+      this.value = 2
+    }, 3000)
   },
   methods: {
-    handleNodeExpand(nodeData, node, instance) {
-      
-    },
+    handleNodeExpand(nodeData, node, instance) {},
+
     aa() {
       console.log(this.$refs.selectTree.getCurrentInfo());
     },
+
     change(value) {
       console.log(value);
     },
 
-    loadData() {
+    async loadData() {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          if (id === 3) resolve ([])
-          resolve ([
+          if (id === 3) resolve([]);
+          resolve([
             {
               value: ++id,
               label: `选项${id}`,
               children: [],
             },
-          ])
+          ]);
         }, 1000);
       });
+      /* try {
+        const  res = await http (); 
+        return res; 
+        
+      } catch (error) {
+        console.error(error);
+        return []
+      } */
     },
   },
 };

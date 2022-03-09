@@ -184,7 +184,7 @@ export default {
           target: { checked: !this.node.checked }
         });
       }
-      this.tree.$emit('node-click', this.node.getText (), this.node.getValueByOption (), this.node.data, this.node, this);
+      this.tree.$emit('node-click', this.node.getPathText (), this.node.getValueByOption (), this.node.data, this.node, this);
     },
 
     handleContextMenu(event) {

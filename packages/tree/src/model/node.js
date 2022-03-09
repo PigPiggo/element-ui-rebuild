@@ -490,7 +490,7 @@ export default class Node {
   getValueByOption() {
     return this.store.props.emitPath
       ? this.getPathValues()
-      : this.getValue();
+      : this.getCurrentValue();
   }
   calculatePathNodes() {
     const nodes = [this];
@@ -506,7 +506,7 @@ export default class Node {
   getPathLabels() {
     return this.pathLabels;
   }
-  getPathpathNodess() {
+  getPathNodes() {
     return this.pathNodes;
   }
   getPathValues() {
@@ -515,11 +515,15 @@ export default class Node {
   getPathDatas() {
     return this.pathDatas;
   }
-  getValue() {
-    return this.data;
+  getCurrentValue() {
+    return this.data[this.store.props.value];
   }
 
-  getText() {
+  getCurrentLabel() {
+    return this.data[this.store.props.label];
+  }
+
+  getPathText() {
     return this.getPathLabels().join(this.store.props.separator)
   }
 
