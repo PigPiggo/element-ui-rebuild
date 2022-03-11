@@ -101,6 +101,10 @@ import Clickoutside from 'element-ui/src/utils/clickoutside';
 import { isDef } from 'element-ui/src/utils/shared';
 import ElTreeSelectMenu from './select-menu';
 import Emitter from 'element-ui/src/mixins/emitter';
+import {
+  addResizeListener,
+  removeResizeListener,
+} from 'element-ui/src/utils/resize-event';
 
 export default {
   mixins: [Emitter],
@@ -240,9 +244,13 @@ export default {
   },
 
   mounted() {
-    this.wrapWidth =
-      this.$refs.reference.$el.getBoundingClientRect().width + 'px';
+    addResizeListener(this.$el, this.handleResize);
+    this.resetInputWidth();
     this.initSyncValue();
+  },
+  beforeDestroy() {
+    if (this.$el && this.handleResize)
+      removeResizeListener(this.$el, this.handleResize);
   },
   watch: {
     data: {
@@ -417,10 +425,10 @@ export default {
     // 懒加载逻辑
     handleLazyLoad(nodeData, node) {
       if (node.childNodes.length !== 0) return;
-      const update = (res) => {
-        this.updateData (res, node, nodeData); 
-      }
-      this.loadData(node, nodeData, update)
+      const update = res => {
+        this.updateData(res, node, nodeData);
+      };
+      this.loadData(node, nodeData, update);
     },
     updateData(res, node, nodeData) {
       node.loading = false;
@@ -432,6 +440,17 @@ export default {
       } else {
         nodeData.children = res;
       }
+    },
+
+    resetInputWidth() {
+      const reference = this.$refs.reference;
+      if (reference && reference.$el) {
+        this.wrapWidth = reference.$el.getBoundingClientRect().width + 'px';
+      }
+    },
+    handleResize() {
+      this.resetInputWidth();
+      if (this.multiple) this.resetInputHeight();
     },
   },
 };
