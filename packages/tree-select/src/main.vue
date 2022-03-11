@@ -220,8 +220,8 @@ export default {
 
       // todo 后面在扩展新功能
       /* return this.multiple
-        ? !!this.checkedNodes.filter(node => !node.disabled).length
-        : !!this.presentText; */
+      ? !!this.checkedNodes.filter(node => !node.disabled).length
+      : !!this.presentText; */
     },
   },
   data() {
@@ -261,7 +261,6 @@ export default {
         }
         cacheLastExpand.node.loading = false;
       },
-      deep: true,
     },
   },
   methods: {
@@ -307,6 +306,35 @@ export default {
           immediate: true,
         }
       );
+    },
+    handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
+      this.inputValue = pathLabel;
+      this.syncValue(pathValue);
+    },
+    search(keywords) {
+      if (this.lazy)
+        return this.$emit('search', keywords, this.setSearchResData);
+      return this.$refs.tree.filter(keywords);
+    },
+    setSearchResData(data) {
+      this.searchResData = data;
+    },
+    handleClear() {
+      this.search();
+    },
+    syncValue(value) {
+      this.$emit('input', value);
+    },
+    toggleDropDownVisible(visible) {
+      if (this.disabled) return;
+      this.visible = isDef(visible) ? visible : !this.visible;
+      this.broadcast('ElTreeSelectDropdown', 'updatePopper');
+    },
+    handleNodeExpand(nodeData, node, instance) {
+      if (!node.childNodes.length) {
+        node.loading = true;
+        this.handlerLazyLoad(nodeData, node);
+      }
     },
     handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
       this.inputValue = pathLabel;
@@ -420,6 +448,22 @@ export default {
           await this.$nextTick();
         }
       }
+    },
+
+    // 懒加载逻辑
+    handlerLazyLoad(nodeData, node) {
+      if (node.childNodes.length !== 0) return;
+      this.loadData().then(res => {
+        node.loading = false;
+        if (!res) return;
+        if (!Array.isArray(res))
+          throw new Error('loadData应返回一个由Promise包裹的数组');
+        if (res.length === 0) {
+          node.isLeaf = true;
+        } else {
+          nodeData.children = res;
+        }
+      });
     },
 
     // 懒加载逻辑
