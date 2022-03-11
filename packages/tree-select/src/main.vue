@@ -372,7 +372,7 @@ export default {
         pathData: currentNode.getPathDatas(),
         currentValue: currentNode.getCurrentValue(),
         currentLabel: currentNode.getCurrentLabel(),
-        pathLabel: currentNode.getPathLabels(),
+        getPathText: currentNode.getPathText(),
       };
     },
 
@@ -415,9 +415,11 @@ export default {
         const { pathNodes } = selectNode;
         for (let i in pathNodes) {
           if (Number(i) === pathNodes.length - 1) {
-            return pathNodes[i].instance.handleClick();
+            store.setCurrentNode(pathNodes[i]);
+            this.inputValue = store.currentNode.getPathText()
+            return; 
           }
-          pathNodes[i].expanded = true;
+          pathNodes[i].expand();
           await this.$nextTick();
         }
       }

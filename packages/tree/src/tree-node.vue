@@ -279,5 +279,8 @@ export default {
       });
     }
   }, 
+  mounted () {
+    this.node.setInstance (this);
+  }
 };
 </script>
