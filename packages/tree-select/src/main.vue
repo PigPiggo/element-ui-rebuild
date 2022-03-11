@@ -311,6 +311,7 @@ export default {
       this.inputValue = pathLabel;
       this.syncValue(pathValue);
       this.toggleDropDownVisible (false)
+      this.$emit ('node-click', pathLabel, pathValue, nodeData, node, instance)
     },
     search(keywords) {
       if (this.lazy)
