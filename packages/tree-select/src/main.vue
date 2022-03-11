@@ -310,35 +310,7 @@ export default {
     handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
       this.inputValue = pathLabel;
       this.syncValue(pathValue);
-    },
-    search(keywords) {
-      if (this.lazy)
-        return this.$emit('search', keywords, this.setSearchResData);
-      return this.$refs.tree.filter(keywords);
-    },
-    setSearchResData(data) {
-      this.searchResData = data;
-    },
-    handleClear() {
-      this.search();
-    },
-    syncValue(value) {
-      this.$emit('input', value);
-    },
-    toggleDropDownVisible(visible) {
-      if (this.disabled) return;
-      this.visible = isDef(visible) ? visible : !this.visible;
-      this.broadcast('ElTreeSelectDropdown', 'updatePopper');
-    },
-    handleNodeExpand(nodeData, node, instance) {
-      if (!node.childNodes.length) {
-        node.loading = true;
-        this.handlerLazyLoad(nodeData, node);
-      }
-    },
-    handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
-      this.inputValue = pathLabel;
-      this.syncValue(pathValue);
+      this.toggleDropDownVisible (false)
     },
     search(keywords) {
       if (this.lazy)
