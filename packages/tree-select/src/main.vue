@@ -417,7 +417,7 @@ export default {
           if (Number(i) === pathNodes.length - 1) {
             return pathNodes[i].instance.handleClick();
           }
-          pathNodes[i].instance.handleExpandIconClick();
+          pathNodes[i].expanded = true;
           await this.$nextTick();
         }
       }

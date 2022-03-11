@@ -537,8 +537,4 @@ export default class Node {
     this.pathLabels = this.pathNodes.map(node => node.data[this.store.props.label]);
     this.pathDatas = this.pathNodes.map(node => node.data);
   }
-
-  setInstance(VueComponent) {
-    this.instance = VueComponent;
-  }
 }

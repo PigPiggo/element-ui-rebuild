@@ -302,6 +302,27 @@ export default {
     };
   },
   mounted() {
+    setTimeout (() => {
+      this.data = [
+        {
+          value: '123',
+          label: `选项123`,
+          children: [
+            {
+              value: '333',
+              label: `选项333`,
+              children: [
+                {
+                  value: '444',
+                  label: `选项444`,
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    }, 2000)
     setTimeout(() => {
       this.data = [
         {
