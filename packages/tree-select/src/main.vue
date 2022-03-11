@@ -422,23 +422,6 @@ export default {
         }
       }
     },
-
-    // 懒加载逻辑
-    handlerLazyLoad(nodeData, node) {
-      if (node.childNodes.length !== 0) return;
-      this.loadData().then(res => {
-        node.loading = false;
-        if (!res) return;
-        if (!Array.isArray(res))
-          throw new Error('loadData应返回一个由Promise包裹的数组');
-        if (res.length === 0) {
-          node.isLeaf = true;
-        } else {
-          nodeData.children = res;
-        }
-      });
-    },
-
     // 懒加载逻辑
     handleLazyLoad(nodeData, node) {
       if (node.childNodes.length !== 0) return;
