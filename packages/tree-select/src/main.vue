@@ -333,7 +333,9 @@ export default {
       this.broadcast('ElTreeSelectDropdown', 'updatePopper');
     },
     handleNodeExpand(nodeData, node, instance) {
-      if (!node.childNodes.length) {
+      if (!node.childNodes.length || node.isInit) {
+        if(node.isInit)
+          node.isInit = false; 
         node.loading = true;
         this.handleLazyLoad(nodeData, node);
       }
@@ -414,6 +416,7 @@ export default {
             : this.value);
         const { pathNodes } = selectNode;
         for (let i in pathNodes) {
+          pathNodes[i].isInit = true; 
           if (Number(i) === pathNodes.length - 1) {
             store.setCurrentNode(pathNodes[i]);
             this.inputValue = store.currentNode.getPathText()
@@ -426,7 +429,6 @@ export default {
     },
     // 懒加载逻辑
     handleLazyLoad(nodeData, node) {
-      if (node.childNodes.length !== 0) return;
       const update = res => {
         this.updateData(res, node, nodeData);
       };

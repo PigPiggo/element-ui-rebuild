@@ -74,6 +74,8 @@ export default class Node {
     this.visible = true;
     this.isCurrent = false;
     this.instance = null;
+    // 是否为懒加载首次回显的node
+    this.isInit = false; 
 
     for (let name in options) {
       if (options.hasOwnProperty(name)) {
