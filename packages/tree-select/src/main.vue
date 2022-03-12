@@ -48,11 +48,12 @@
             view-class="el-tree-select-dropdown__list"
             ref="scrollbar"
             :class="{
-              'is-empty': !treeData.length,
+              'is-empty': !data.length,
             }"
           >
-            <el-tree
+            <el-tree-lazy
               ref="tree"
+              :value="value"
               :highlight-current="highlightCurrent"
               :data="treeData"
               :emptyText="emptyText"
@@ -63,7 +64,7 @@
               :showCheckbox="showCheckbox"
               :draggable="draggable"
               :props="props"
-              :lazy="false"
+              :lazy="true"
               :nodeKey="nodeKey"
               :checkStrictly="checkStrictly"
               :defaultExpandAll="defaultExpandAll"
@@ -75,7 +76,7 @@
               :allowDrag="allowDrag"
               :allowDrop="allowDrop"
               :highlightCurrent="highlightCurrent"
-              :load="load"
+              :load="loadData"
               :filterNodeMethod="filterNodeMethod"
               :accordion="accordion"
               :iconClass="iconClass"
@@ -87,7 +88,7 @@
               @node-drag-end="handleDragEnd"
               @node-drop="handleDrop"
               @node-click="handleNodeClick"
-            ></el-tree>
+            ></el-tree-lazy>
           </el-scrollbar>
         </div>
       </el-tree-select-menu>
@@ -96,7 +97,6 @@
 </template>
 
 <script>
-let cacheLastExpand = null;
 import Clickoutside from 'element-ui/src/utils/clickoutside';
 import { isDef } from 'element-ui/src/utils/shared';
 import ElTreeSelectMenu from './select-menu';
@@ -106,6 +106,7 @@ import {
   removeResizeListener,
 } from 'element-ui/src/utils/resize-event';
 
+let unWatchData = null;
 export default {
   mixins: [Emitter],
 
@@ -189,6 +190,12 @@ export default {
         return false;
       },
     },
+    lazyExpand: {
+      type: Boolean,
+      default: () => {
+        return false;
+      },
+    },
     highlightCurrent: {
       default() {
         return true;
@@ -209,9 +216,6 @@ export default {
     },
   },
   computed: {
-    treeData() {
-      return this.lazy ? this.searchResData : this.data;
-    },
     clearBtnVisible() {
       if (!this.clearable || this.disabled) {
         return false;
@@ -228,7 +232,6 @@ export default {
     return {
       inputValue: '',
       keywords: '',
-      searchResData: [],
       visible: false,
       checkedValue: this.value,
       inputHover: false,
@@ -240,73 +243,32 @@ export default {
       inputInitialHeight: 0,
       pressDeleteCount: 0,
       wrapWidth: '',
+      treeData: []
     };
   },
 
   mounted() {
     addResizeListener(this.$el, this.handleResize);
     this.resetInputWidth();
-    this.initSyncValue();
+    // this.initSyncValue();
   },
   beforeDestroy() {
     if (this.$el && this.handleResize)
       removeResizeListener(this.$el, this.handleResize);
   },
   watch: {
-    data: {
-      handler() {
-        if (!cacheLastExpand) return;
-        if (!Array.isArray(cacheLastExpand.node.childNodes)) {
-          cacheLastExpand.node.isLeaf = true;
-        }
-        cacheLastExpand.node.loading = false;
-      },
-    },
+    value: {
+      async handler (newValue, oldValue) {
+        if (newValue === oldValue) return; 
+        await this.$nextTick (); 
+        this.inputValue = this.getCurrentInfo ().pathText;
+      }
+    }, 
+    data (data) {
+      this.treeData = data; 
+    }
   },
   methods: {
-    initSyncValue() {
-      const sync = () => {
-        unwatchData && unwatchData();
-        unWatchValue && unWatchValue();
-        this.syncValueSelect();
-      };
-
-      const unwatchData = this.$watch(
-        'data',
-        async data => {
-          if (!!data && Array.isArray(data) && data.length) {
-            this.searchResData = data;
-            if (this.value && !this.inputValue) {
-              await this.$nextTick();
-              sync();
-            }
-          }
-        },
-        {
-          deep: true,
-          immediate: true,
-        }
-      );
-      const unWatchValue = this.$watch(
-        'value',
-        async value => {
-          if (
-            !!this.data &&
-            Array.isArray(this.data) &&
-            this.data.length &&
-            !this.inputValue &&
-            value
-          ) {
-            await this.$nextTick();
-            sync();
-          }
-        },
-        {
-          deep: true,
-          immediate: true,
-        }
-      );
-    },
     handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
       this.inputValue = pathLabel;
       this.syncValue(pathValue);
@@ -319,7 +281,7 @@ export default {
       return this.$refs.tree.filter(keywords);
     },
     setSearchResData(data) {
-      this.searchResData = data;
+      this.treeData = data;
     },
     handleClear() {
       this.search();
@@ -333,12 +295,6 @@ export default {
       this.broadcast('ElTreeSelectDropdown', 'updatePopper');
     },
     handleNodeExpand(nodeData, node, instance) {
-      if (!node.childNodes.length || node.isInit) {
-        if(node.isInit)
-          node.isInit = false; 
-        node.loading = true;
-        this.handleLazyLoad(nodeData, node);
-      }
       this.$emit('node-expand', nodeData, node, instance);
     },
     // todo 拖拽功能暂无
@@ -365,87 +321,12 @@ export default {
     },
 
     getCurrentInfo() {
-      const currentNode = this.$refs.tree.store.currentNode;
-      return {
-        currentNode,
-        pathLabels: currentNode.getPathLabels(),
-        pathNodes: currentNode.getPathNodes(),
-        pathValue: currentNode.getPathValues(),
-        pathData: currentNode.getPathDatas(),
-        currentValue: currentNode.getCurrentValue(),
-        currentLabel: currentNode.getCurrentLabel(),
-        getPathText: currentNode.getPathText(),
-      };
+      return this.$refs.tree.getCurrentInfo (); 
     },
 
     doDestroy() {
       this.$refs.popper && this.$refs.popper.doDestroy();
     },
-
-    //   当传入value的时候, 设置选择状态
-    async syncValueSelect() {
-      let value = Array.isArray(this.value)
-        ? this.value[this.value.length - 1]
-        : this.value;
-      // const store = {...this.$refs.tree.store}
-      const store = this.$refs.tree.store;
-      if (
-        !!store.root.childNodes &&
-        Array.isArray(store.root.childNodes) &&
-        store.root.childNodes.length
-      ) {
-        function findSelectNode(NodeList, needExpand) {
-          for (let node of NodeList) {
-            if (
-              (node.data[store.props.value] || node.data[store.props.label]) ===
-              value
-            )
-              return node;
-            if (
-              !!node.childNodes &&
-              Array.isArray(node.childNodes) &&
-              node.childNodes.length
-            )
-              return findSelectNode(node.childNodes);
-          }
-        }
-        const selectNode = findSelectNode(store.root.childNodes);
-        if (!selectNode)
-          return (this.inputValue = Array.isArray(this.value)
-            ? this.value.join(store.props.separator)
-            : this.value);
-        const { pathNodes } = selectNode;
-        for (let i in pathNodes) {
-          pathNodes[i].isInit = true; 
-          if (Number(i) === pathNodes.length - 1) {
-            store.setCurrentNode(pathNodes[i]);
-            this.inputValue = store.currentNode.getPathText()
-            return; 
-          }
-          // pathNodes[i].expand();
-          await this.$nextTick();
-        }
-      }
-    },
-    // 懒加载逻辑
-    handleLazyLoad(nodeData, node) {
-      const update = res => {
-        this.updateData(res, node, nodeData);
-      };
-      this.loadData(node, nodeData, update);
-    },
-    updateData(res, node, nodeData) {
-      node.loading = false;
-      if (!res) return;
-      if (!Array.isArray(res))
-        throw new Error('loadData应返回一个由Promise包裹的数组');
-      if (res.length === 0) {
-        node.isLeaf = true;
-      } else {
-        nodeData.children = res;
-      }
-    },
-
     resetInputWidth() {
       const reference = this.$refs.reference;
       if (reference && reference.$el) {

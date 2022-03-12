@@ -22,10 +22,10 @@ export const getChildState = node => {
   return { all, none, allWithoutDisable, half: !all && !none };
 };
 
-const reInitChecked = function(node) {
+const reInitChecked = function (node) {
   if (node.childNodes.length === 0) return;
 
-  const {all, none, half} = getChildState(node.childNodes);
+  const { all, none, half } = getChildState(node.childNodes);
   if (all) {
     node.checked = true;
     node.indeterminate = false;
@@ -45,7 +45,7 @@ const reInitChecked = function(node) {
   }
 };
 
-const getPropertyFromData = function(node, prop) {
+const getPropertyFromData = function (node, prop) {
   const props = node.store.props;
   const data = node.data || {};
   const config = props[prop];
@@ -73,13 +73,15 @@ export default class Node {
     this.parent = null;
     this.visible = true;
     this.isCurrent = false;
+    this.instance = null;
+    // 是否为懒加载首次回显的node
+    this.isInit = options.store.lazy; 
 
     for (let name in options) {
       if (options.hasOwnProperty(name)) {
         this[name] = options[name];
       }
     }
-
     // internal
     this.level = 0;
     this.loaded = false;
@@ -104,7 +106,7 @@ export default class Node {
       }
     }
 
-    if (store.lazy !== true && this.data) {
+    /* if (store.lazy !== true && this.data) {
       this.setData(this.data);
 
       if (store.defaultExpandAll) {
@@ -112,7 +114,11 @@ export default class Node {
       }
     } else if (this.level > 0 && store.lazy && store.defaultExpandAll) {
       this.expand();
-    }
+    } */
+    if (!!this.data) 
+      this.setData(this.data); 
+    if (store.defaultExpandAll)
+      this.expanded = true; 
     if (!Array.isArray(this.data)) {
       markNodeData(this, this.data);
     }
@@ -133,6 +139,8 @@ export default class Node {
     }
 
     this.updateLeafState();
+
+    this.initPath()
   }
 
   setData(data) {
@@ -149,7 +157,6 @@ export default class Node {
     } else {
       children = getPropertyFromData(this, 'children') || [];
     }
-
     for (let i = 0, j = children.length; i < j; i++) {
       this.insertChild({ data: children[i] });
     }
@@ -192,7 +199,7 @@ export default class Node {
   }
 
   contains(target, deep = true) {
-    const walk = function(parent) {
+    const walk = function (parent) {
       const children = parent.childNodes || [];
       let result = false;
       for (let i = 0, j = children.length; i < j; i++) {
@@ -237,7 +244,6 @@ export default class Node {
     }
 
     child.level = this.level + 1;
-
     if (typeof index === 'undefined' || index < 0) {
       this.childNodes.push(child);
     } else {
@@ -337,20 +343,12 @@ export default class Node {
   }
 
   shouldLoadData() {
-    return this.store.lazy === true && this.store.load && !this.loaded;
+    return this.isInit
   }
 
   updateLeafState() {
-    if (this.store.lazy === true && this.loaded !== true && typeof this.isLeafByUser !== 'undefined') {
-      this.isLeaf = this.isLeafByUser;
-      return;
-    }
-    const childNodes = this.childNodes;
-    if (!this.store.lazy || (this.store.lazy === true && this.loaded === true)) {
-      this.isLeaf = !childNodes || childNodes.length === 0;
-      return;
-    }
-    this.isLeaf = false;
+    this.isLeaf = this.childNodes && this.childNodes.length ? false
+      : this.isInit ? false : true; 
   }
 
   setChecked(value, deep, recursion, passValue) {
@@ -459,27 +457,77 @@ export default class Node {
   }
 
   loadData(callback, defaultProps = {}) {
-    if (this.store.lazy === true && this.store.load && !this.loaded && (!this.loading || Object.keys(defaultProps).length)) {
+    if (this.store.lazy && !this.isLeaf) {
+      if (!this.store.load)
+        throw new Error ('未传load参数')
       this.loading = true;
-
       const resolve = (children) => {
         this.loaded = true;
         this.loading = false;
         this.childNodes = [];
-
         this.doCreateChildren(children, defaultProps);
-
+        this.isInit = false;
         this.updateLeafState();
         if (callback) {
           callback.call(this, children);
         }
       };
-
-      this.store.load(this, resolve);
+      this.store.load(this, this.data, resolve);
     } else {
       if (callback) {
         callback.call(this);
       }
     }
+  }
+
+  getValueByOption() {
+    return this.store.props.emitPath
+      ? this.getPathValues()
+      : this.getCurrentValue();
+  }
+  calculatePathNodes() {
+    const nodes = [this];
+    let parent = this.parent;
+
+    while (parent && !Array.isArray(parent.data)) {
+      nodes.unshift(parent);
+      parent = parent.parent;
+    }
+
+    return nodes;
+  }
+  getPathLabels() {
+    return this.pathLabels;
+  }
+  getPathNodes() {
+    return this.pathNodes;
+  }
+  getPathValues() {
+    return this.pathValues;
+  }
+  getPathDatas() {
+    return this.pathDatas;
+  }
+  getCurrentValue() {
+    return this.data[this.store.props.value];
+  }
+
+  getCurrentLabel() {
+    return this.data[this.store.props.label];
+  }
+
+  getPathText() {
+    return this.getPathLabels().join(this.store.props.separator)
+  }
+
+  initPath() {
+    if (!this.store.props.emitPath)
+      return;
+    this.pathNodes = this.calculatePathNodes();
+    this.pathValues = this.pathNodes.map(node => !isNaN(node.data[this.store.props.value]) ? node.data[this.store.props.value] :
+      !!node.data[this.store.props.value] ? node.data[this.store.props.value] :
+        node.data[this.store.props.label]);
+    this.pathLabels = this.pathNodes.map(node => node.data[this.store.props.label]);
+    this.pathDatas = this.pathNodes.map(node => node.data);
   }
 }

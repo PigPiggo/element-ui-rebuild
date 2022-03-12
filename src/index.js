@@ -41,6 +41,7 @@ import TabPane from '../packages/tab-pane/index.js';
 import Tag from '../packages/tag/index.js';
 import Tree from '../packages/tree/index.js';
 import TreeSelect from '../packages/tree-select/index.js';
+import TreeLazy from '../packages/tree-lazy/index.js';
 import Alert from '../packages/alert/index.js';
 import Notification from '../packages/notification/index.js';
 import Slider from '../packages/slider/index.js';
@@ -133,6 +134,7 @@ const components = [
   Tag,
   Tree,
   TreeSelect,
+  TreeLazy,
   Alert,
   Slider,
   Icon,
@@ -259,6 +261,7 @@ export default {
   Tag,
   Tree,
   TreeSelect,
+  TreeLazy,
   Alert,
   Notification,
   Slider,

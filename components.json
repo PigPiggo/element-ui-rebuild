@@ -40,6 +40,7 @@
   "tag": "./packages/tag/index.js",
   "tree": "./packages/tree/index.js",
   "tree-select": "./packages/tree-select/index.js",
+  "tree-lazy": "./packages/tree-lazy/index.js",
   "alert": "./packages/alert/index.js",
   "notification": "./packages/notification/index.js",
   "slider": "./packages/slider/index.js",
