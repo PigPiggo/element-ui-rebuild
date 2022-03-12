@@ -419,7 +419,7 @@ export default {
             this.inputValue = store.currentNode.getPathText()
             return; 
           }
-          pathNodes[i].expand();
+          // pathNodes[i].expand();
           await this.$nextTick();
         }
       }
