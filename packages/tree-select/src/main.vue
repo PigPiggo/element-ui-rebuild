@@ -55,7 +55,7 @@
               ref="tree"
               :value="value"
               :highlight-current="highlightCurrent"
-              :data="treeData"
+              :data="data"
               :emptyText="emptyText"
               :renderAfterExpand="renderAfterExpand"
               :expandOnClickNode="expandOnClickNode"
@@ -106,7 +106,6 @@ import {
   removeResizeListener,
 } from 'element-ui/src/utils/resize-event';
 
-let unWatchData = null;
 export default {
   mixins: [Emitter],
 
@@ -243,7 +242,6 @@ export default {
       inputInitialHeight: 0,
       pressDeleteCount: 0,
       wrapWidth: '',
-      treeData: []
     };
   },
 
@@ -264,9 +262,6 @@ export default {
         this.inputValue = this.getCurrentInfo ().pathText;
       }
     }, 
-    data (data) {
-      this.treeData = data; 
-    }
   },
   methods: {
     handleNodeClick(pathLabel, pathValue, nodeData, node, instance) {
@@ -277,13 +272,11 @@ export default {
     },
     search(keywords) {
       if (this.lazy)
-        return this.$emit('search', keywords, this.setSearchResData);
+        return this.$emit('search', keywords);
       return this.$refs.tree.filter(keywords);
     },
-    setSearchResData(data) {
-      this.treeData = data;
-    },
     handleClear() {
+      this.keywords = ''
       this.search();
     },
     syncValue(value) {
