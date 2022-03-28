@@ -241,7 +241,7 @@ export default {
 
     getCurrentInfo () {
       const currentNode = this.store.getCurrentNode();
-      return {
+      return currentNode ? {
         currentNode,
         pathLabels: currentNode.getPathLabels(),
         pathNodes: currentNode.getPathNodes(),
@@ -250,6 +250,15 @@ export default {
         currentValue: currentNode.getCurrentValue(),
         currentLabel: currentNode.getCurrentLabel(),
         pathText: currentNode.getPathText(),
+      } : {
+        currentNode: null,
+        pathLabels: '',
+        pathNodes: [],
+        pathValue: [],
+        pathData: [],
+        currentValue: '',
+        currentLabel: '',
+        pathText: '',
       };
     }, 
 
@@ -418,7 +427,6 @@ export default {
 
   created() {
     this.isTree = true;
-
     this.store = new TreeStore({
       key: this.nodeKey,
       data: this.data,

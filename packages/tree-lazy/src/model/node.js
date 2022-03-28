@@ -126,7 +126,7 @@ export default class Node {
     const defaultExpandedKeys = store.defaultExpandedKeys;
     const key = store.key;
     if (key && defaultExpandedKeys && defaultExpandedKeys.indexOf(this.key) !== -1) {
-      this.expand(null, store.autoExpandParent);
+      this.expand(null, store.autoExpandParent, true);
     }
 
     if (key && store.currentNodeKey !== undefined && this.key === store.currentNodeKey) {
@@ -303,7 +303,7 @@ export default class Node {
     }
   }
 
-  expand(callback, expandParent) {
+  expand(callback, expandParent, isExpandDefault = false) {
     const done = () => {
       if (expandParent) {
         let parent = this.parent;
@@ -316,7 +316,7 @@ export default class Node {
       if (callback) callback();
     };
 
-    if (this.shouldLoadData()) {
+    if (this.shouldLoadData() && !isExpandDefault) {
       this.loadData((data) => {
         if (data instanceof Array) {
           if (this.checked) {
@@ -343,7 +343,7 @@ export default class Node {
   }
 
   shouldLoadData() {
-    return this.isInit
+    return this.isInit && !this.store.isSearch;
   }
 
   updateLeafState() {
