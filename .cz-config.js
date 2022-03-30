@@ -15,6 +15,7 @@ module.exports = {
     { name: "ElSelectTree" },
     { name: "Eltree" },
     { name: "ElTableRem" },
+    { name: "ElProgressColor" },
   ],
 
 
