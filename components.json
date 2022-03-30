@@ -51,6 +51,7 @@
   "col": "./packages/col/index.js",
   "upload": "./packages/upload/index.js",
   "progress": "./packages/progress/index.js",
+  "progress-color": "./packages/progress-color/index.js",
   "spinner": "./packages/spinner/index.js",
   "message": "./packages/message/index.js",
   "badge": "./packages/badge/index.js",

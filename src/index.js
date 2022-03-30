@@ -52,6 +52,7 @@ import Row from '../packages/row/index.js';
 import Col from '../packages/col/index.js';
 import Upload from '../packages/upload/index.js';
 import Progress from '../packages/progress/index.js';
+import ProgressColor from '../packages/progress-color/index.js';
 import Spinner from '../packages/spinner/index.js';
 import Message from '../packages/message/index.js';
 import Badge from '../packages/badge/index.js';
@@ -144,6 +145,7 @@ const components = [
   Col,
   Upload,
   Progress,
+  ProgressColor,
   Spinner,
   Badge,
   Card,
@@ -273,6 +275,7 @@ export default {
   Col,
   Upload,
   Progress,
+  ProgressColor,
   Spinner,
   Message,
   Badge,
