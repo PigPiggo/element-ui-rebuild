@@ -14,6 +14,7 @@ module.exports = {
   scopes: [
     { name: "ElSelectTree" },
     { name: "Eltree" },
+    { name: "ElTableRem" },
   ],
 
 
