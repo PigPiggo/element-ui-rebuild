@@ -26,6 +26,7 @@
   "table": "./packages/table/index.js",
   "table-rem": "./packages/table-rem/index.js",
   "table-column": "./packages/table-column/index.js",
+  "table-column-rem": "./packages/table-column-rem/index.js",
   "date-picker": "./packages/date-picker/index.js",
   "time-select": "./packages/time-select/index.js",
   "time-picker": "./packages/time-picker/index.js",

@@ -1,8 +1,8 @@
-import ElTableColumnRem from '../table-rem/src/table-column';
+import ElTableColumn from '../table/src/table-column';
 
 /* istanbul ignore next */
-ElTableColumnRem.install = function(Vue) {
-  Vue.component(ElTableColumnRem.name, ElTableColumnRem);
+ElTableColumn.install = function(Vue) {
+  Vue.component(ElTableColumn.name, ElTableColumn);
 };
 
-export default ElTableColumnRem;
+export default ElTableColumn;
