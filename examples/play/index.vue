@@ -6,14 +6,14 @@
       border
       style="width: 100%"
     >
-      <el-table-column prop="id" label="ID" width="1.80"> </el-table-column>
-      <el-table-column prop="name" label="姓名"> </el-table-column>
-      <el-table-column prop="amount1" sortable label="数值 1">
-      </el-table-column>
-      <el-table-column prop="amount2" sortable label="数值 2">
-      </el-table-column>
-      <el-table-column prop="amount3" sortable label="数值 3">
-      </el-table-column>
+      <el-table-column-rem prop="id" label="ID" width="1.80"> </el-table-column-rem>
+      <el-table-column-rem prop="name" label="姓名"> </el-table-column-rem>
+      <el-table-column-rem prop="amount1" sortable label="数值 1">
+      </el-table-column-rem>
+      <el-table-column-rem prop="amount2" sortable label="数值 2">
+      </el-table-column-rem>
+      <el-table-column-rem prop="amount3" sortable label="数值 3">
+      </el-table-column-rem>
     </el-table-rem>
     <el-table
       :data="tableData"
@@ -21,14 +21,14 @@
       border
       style="width: 100%"
     >
-      <el-table-column prop="id" label="ID" width="180"> </el-table-column>
-      <el-table-column prop="name" label="姓名"> </el-table-column>
-      <el-table-column prop="amount1" sortable label="数值 1">
-      </el-table-column>
-      <el-table-column prop="amount2" sortable label="数值 2">
-      </el-table-column>
-      <el-table-column prop="amount3" sortable label="数值 3">
-      </el-table-column>
+      <el-table-column-rem prop="id" label="ID" width="180"> </el-table-column-rem>
+      <el-table-column-rem prop="name" label="姓名"> </el-table-column-rem>
+      <el-table-column-rem prop="amount1" sortable label="数值 1">
+      </el-table-column-rem>
+      <el-table-column-rem prop="amount2" sortable label="数值 2">
+      </el-table-column-rem>
+      <el-table-column-rem prop="amount3" sortable label="数值 3">
+      </el-table-column-rem>
     </el-table>
   </div>
 </template>

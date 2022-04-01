@@ -152,7 +152,7 @@ export function mergeOptions(defaults, config) {
 
 export function parseWidth(width) {
   if (width !== undefined) {
-    width = parseInt(width, 10);
+    width = parseFloat(width, 10);
     if (isNaN(width)) {
       width = null;
     }

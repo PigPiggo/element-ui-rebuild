@@ -5,7 +5,7 @@ import ElCheckbox from 'element-ui/packages/checkbox';
 let columnIdSeed = 1;
 
 export default {
-  name: 'ElTableColumn',
+  name: 'ElTableColumnRem',
 
   props: {
     type: {
@@ -295,6 +295,9 @@ export default {
     // 注册 watcher
     this.registerNormalWatchers();
     this.registerComplexWatchers();
+    setTimeout(() => {
+      console.log(this);
+    }, 500)
   },
 
   mounted() {
