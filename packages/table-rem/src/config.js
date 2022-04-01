@@ -5,22 +5,22 @@ export const cellStarts = {
     order: ''
   },
   selection: {
-    width: 48,
-    minWidth: 48,
-    realWidth: 48,
+    width: 0.48,
+    minWidth: 0.48,
+    realWidth: 0.48,
     order: '',
     className: 'el-table-column--selection'
   },
   expand: {
-    width: 48,
-    minWidth: 48,
-    realWidth: 48,
+    width: 0.48,
+    minWidth: 0.48,
+    realWidth: 0.48,
     order: ''
   },
   index: {
-    width: 48,
-    minWidth: 48,
-    realWidth: 48,
+    width: 0.48,
+    minWidth: 0.48,
+    realWidth: 0.48,
     order: ''
   }
 };

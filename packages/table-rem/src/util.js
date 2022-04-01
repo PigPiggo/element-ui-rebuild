@@ -164,7 +164,7 @@ export function parseMinWidth(minWidth) {
   if (typeof minWidth !== 'undefined') {
     minWidth = parseWidth(minWidth);
     if (isNaN(minWidth)) {
-      minWidth = 80;
+      minWidth = 0.8;
     }
   }
   return minWidth;

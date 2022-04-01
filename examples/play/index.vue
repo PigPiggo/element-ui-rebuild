@@ -15,21 +15,6 @@
       <el-table-column-rem prop="amount3" sortable label="数值 3">
       </el-table-column-rem>
     </el-table-rem>
-    <el-table
-      :data="tableData"
-      :span-method="arraySpanMethod"
-      border
-      style="width: 100%"
-    >
-      <el-table-column-rem prop="id" label="ID" width="180"> </el-table-column-rem>
-      <el-table-column-rem prop="name" label="姓名"> </el-table-column-rem>
-      <el-table-column-rem prop="amount1" sortable label="数值 1">
-      </el-table-column-rem>
-      <el-table-column-rem prop="amount2" sortable label="数值 2">
-      </el-table-column-rem>
-      <el-table-column-rem prop="amount3" sortable label="数值 3">
-      </el-table-column-rem>
-    </el-table>
   </div>
 </template>
 

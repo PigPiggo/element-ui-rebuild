@@ -133,7 +133,7 @@ class TableLayout {
   updateColumnsWidth() {
     if (Vue.prototype.$isServer) return;
     const fit = this.fit;
-    const bodyWidth = this.table.$el.clientWidth;
+    const bodyWidth = this.table.$el.clientWidth / parseFloat (document.querySelector ('html').style.fontSize);
     let bodyMinWidth = 0;
 
     const flattenColumns = this.getFlattenColumns();
@@ -145,7 +145,7 @@ class TableLayout {
 
     if (flexColumns.length > 0 && fit) {
       flattenColumns.forEach((column) => {
-        bodyMinWidth += column.width || column.minWidth || 80;
+        bodyMinWidth += column.width || column.minWidth || 0.8;
       });
 
       const scrollYWidth = this.scrollY ? this.gutterWidth : 0;
@@ -156,20 +156,20 @@ class TableLayout {
         const totalFlexWidth = bodyWidth - scrollYWidth - bodyMinWidth;
 
         if (flexColumns.length === 1) {
-          flexColumns[0].realWidth = (flexColumns[0].minWidth || 80) + totalFlexWidth;
+          flexColumns[0].realWidth = (flexColumns[0].minWidth || 0.8) + totalFlexWidth;
         } else {
-          const allColumnsWidth = flexColumns.reduce((prev, column) => prev + (column.minWidth || 80), 0);
+          const allColumnsWidth = flexColumns.reduce((prev, column) => prev + (column.minWidth || 0.8), 0);
           const flexWidthPerPixel = totalFlexWidth / allColumnsWidth;
           let noneFirstWidth = 0;
 
           flexColumns.forEach((column, index) => {
             if (index === 0) return;
-            const flexWidth = Math.floor((column.minWidth || 80) * flexWidthPerPixel);
+            const flexWidth = Math.floor((column.minWidth || 0.8) * flexWidthPerPixel);
             noneFirstWidth += flexWidth;
-            column.realWidth = (column.minWidth || 80) + flexWidth;
+            column.realWidth = (column.minWidth || 0.8) + flexWidth;
           });
 
-          flexColumns[0].realWidth = (flexColumns[0].minWidth || 80) + totalFlexWidth - noneFirstWidth;
+          flexColumns[0].realWidth = (flexColumns[0].minWidth || 0.8) + totalFlexWidth - noneFirstWidth;
         }
       } else { // HAVE HORIZONTAL SCROLL BAR
         this.scrollX = true;
@@ -183,7 +183,7 @@ class TableLayout {
     } else {
       flattenColumns.forEach((column) => {
         if (!column.width && !column.minWidth) {
-          column.realWidth = 80;
+          column.realWidth = 0.8;
         } else {
           column.realWidth = column.width || column.minWidth;
         }

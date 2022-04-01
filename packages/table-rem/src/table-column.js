@@ -124,7 +124,7 @@ export default {
         column.minWidth = this.realMinWidth;
       }
       if (!column.minWidth) {
-        column.minWidth = 80;
+        column.minWidth = 0.8;
       }
       column.realWidth = column.width === undefined ? column.minWidth : column.width;
       return column;
@@ -295,9 +295,6 @@ export default {
     // 注册 watcher
     this.registerNormalWatchers();
     this.registerComplexWatchers();
-    setTimeout(() => {
-      console.log(this);
-    }, 500)
   },
 
   mounted() {
